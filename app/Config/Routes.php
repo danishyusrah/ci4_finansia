@@ -99,6 +99,12 @@ $routes->group('pos', ['filter' => 'auth'], function($routes) {
 // Group Pengaturan
 $routes->group('settings', ['filter' => 'auth'], function($routes) {
     $routes->get('/', 'Settings::index');
+    
+    // === [BARU] Route Backup Database ===
+    // URL: /settings/backup -> Memanggil Settings::backup()
+    $routes->get('backup', 'Settings::backup');
+    // ====================================
+
     $routes->post('update_profile', 'Settings::update_profile');
     $routes->post('add_wallet', 'Settings::add_wallet');
 });
