@@ -46,6 +46,12 @@ $routes->get('logout', 'Auth::logout');
 // Group Dashboard & Fitur Export
 $routes->group('dashboard', ['filter' => 'auth'], function($routes) {
     $routes->get('/', 'Dashboard::index');
+    
+    // === [BARU] Route untuk Data Realtime Chart ===
+    // Diakses via: /dashboard/chart-data
+    $routes->get('chart-data', 'Dashboard::chartData'); 
+    // ==============================================
+
     $routes->post('save_transaction', 'Dashboard::save_transaction');
     // Rute Export Data
     $routes->get('export_excel', 'Dashboard::export_excel');

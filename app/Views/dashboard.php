@@ -2,297 +2,375 @@
 
 <?= $this->section('content') ?>
 
-<!-- Flash Message -->
-<?php if (session()->getFlashdata('error')) : ?>
-    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
-        <strong class="font-bold">Gagal!</strong>
-        <span class="block sm:inline"><?= session()->getFlashdata('error') ?></span>
-    </div>
-<?php endif; ?>
-
-<?php if (session()->getFlashdata('success')) : ?>
-    <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">
-        <strong class="font-bold">Berhasil!</strong>
-        <span class="block sm:inline"><?= session()->getFlashdata('success') ?></span>
-    </div>
-<?php endif; ?>
-
-<!-- Header Desktop -->
-<div class="hidden sm:flex justify-between items-center mb-8 pt-2">
+<!-- Header & Button (Desktop) -->
+<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
     <div>
-        <h1 class="text-2xl font-bold text-slate-800">Ringkasan Bisnis</h1>
-        <p class="text-slate-500 text-sm mt-1">Halo, <?= esc($user_name) ?>! Semangat jaga modal.</p>
+        <h2 class="text-2xl font-bold text-slate-800">Dashboard</h2>
+        <p class="text-slate-500 text-sm">Ringkasan keuangan Anda hari ini.</p>
     </div>
-    <div class="flex items-center gap-3">
-        <!-- TOMBOL EXPORT PDF BARU (Membuka Modal) -->
-        <button onclick="toggleModal('modalExport')" class="flex items-center gap-2 px-4 py-2 bg-white text-slate-700 border border-slate-300 rounded-lg hover:bg-slate-50 transition shadow-sm">
-            <i data-lucide="file-text" class="w-4 h-4 text-red-600"></i>
-            <span>Export PDF</span>
-        </button>
+    <button onclick="toggleModal('modalTransaction')" class="hidden sm:inline-flex items-center px-4 py-2 bg-primary text-white text-sm font-medium rounded-lg hover:bg-slate-700 transition-colors shadow-sm">
+        <i data-lucide="plus" class="w-4 h-4 mr-2"></i>
+        Transaksi Baru
+    </button>
+</div>
 
-        <button onclick="toggleModal('modalTransaction')" class="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-slate-800 transition shadow-lg shadow-slate-300/50">
-            <i data-lucide="plus" class="w-4 h-4"></i>
-            <span>Catat Transaksi</span>
-        </button>
+<!-- Alerts (Notifikasi) -->
+<?php if(session()->getFlashdata('success')): ?>
+    <div class="bg-green-50 border-l-4 border-green-500 p-4 mb-6 rounded-r-lg relative" role="alert">
+        <div class="flex">
+            <div class="flex-shrink-0">
+                <i data-lucide="check-circle" class="h-5 w-5 text-green-400"></i>
+            </div>
+            <div class="ml-3">
+                <p class="text-sm text-green-700"><?= session()->getFlashdata('success') ?></p>
+            </div>
+        </div>
+    </div>
+<?php endif; ?>
+
+<?php if(session()->getFlashdata('error')): ?>
+    <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-6 rounded-r-lg relative" role="alert">
+        <div class="flex">
+            <div class="flex-shrink-0">
+                <i data-lucide="alert-circle" class="h-5 w-5 text-red-400"></i>
+            </div>
+            <div class="ml-3">
+                <p class="text-sm text-red-700"><?= session()->getFlashdata('error') ?></p>
+            </div>
+        </div>
+    </div>
+<?php endif; ?>
+
+<!-- Stats Cards (Grid Layout) -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+    <!-- Total Kas -->
+    <div class="bg-white rounded-xl shadow-sm p-5 border-l-4 border-blue-500 relative overflow-hidden">
+        <div class="flex justify-between items-start z-10 relative">
+            <div>
+                <p class="text-xs font-semibold text-blue-500 uppercase tracking-wider mb-1">Total Kas</p>
+                <h3 class="text-xl font-bold text-slate-800">Rp <?= number_format($total_kas, 0, ',', '.') ?></h3>
+            </div>
+            <div class="p-2 bg-blue-50 rounded-lg text-blue-500">
+                <i data-lucide="wallet" class="w-6 h-6"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Laba Bersih -->
+    <div class="bg-white rounded-xl shadow-sm p-5 border-l-4 border-green-500 relative overflow-hidden">
+        <div class="flex justify-between items-start z-10 relative">
+            <div>
+                <p class="text-xs font-semibold text-green-500 uppercase tracking-wider mb-1">Laba Bersih</p>
+                <h3 class="text-xl font-bold text-slate-800">Rp <?= number_format($laba_bersih, 0, ',', '.') ?></h3>
+            </div>
+            <div class="p-2 bg-green-50 rounded-lg text-green-500">
+                <i data-lucide="coins" class="w-6 h-6"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Terkunci -->
+    <div class="bg-white rounded-xl shadow-sm p-5 border-l-4 border-yellow-500 relative overflow-hidden">
+        <div class="flex justify-between items-start z-10 relative">
+            <div>
+                <p class="text-xs font-semibold text-yellow-500 uppercase tracking-wider mb-1">Modal Terkunci</p>
+                <h3 class="text-xl font-bold text-slate-800">Rp <?= number_format($modal_terkunci, 0, ',', '.') ?></h3>
+            </div>
+            <div class="p-2 bg-yellow-50 rounded-lg text-yellow-500">
+                <i data-lucide="lock" class="w-6 h-6"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pengeluaran Bulan Ini -->
+    <div class="bg-white rounded-xl shadow-sm p-5 border-l-4 border-red-500 relative overflow-hidden">
+        <div class="flex justify-between items-start z-10 relative">
+            <div>
+                <p class="text-xs font-semibold text-red-500 uppercase tracking-wider mb-1">Pengeluaran (Bulan Ini)</p>
+                <h3 class="text-xl font-bold text-slate-800" id="val-expense">Rp <?= number_format($expense_month, 0, ',', '.') ?></h3>
+            </div>
+            <div class="p-2 bg-red-50 rounded-lg text-red-500">
+                <i data-lucide="trending-down" class="w-6 h-6"></i>
+            </div>
+        </div>
     </div>
 </div>
 
-<!-- INFO CARDS -->
-<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-    <!-- Card 1: Saldo Kas -->
-    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-        <div class="flex justify-between items-start mb-4">
-            <div>
-                <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Total Kas Real</p>
-                <h3 class="text-2xl font-bold text-slate-800 mt-1">Rp <?= number_format($total_kas, 0, ',', '.') ?></h3>
-            </div>
-            <div class="p-2 bg-slate-50 rounded-lg">
-                <i data-lucide="briefcase" class="w-5 h-5 text-slate-600"></i>
-            </div>
-        </div>
-        <div class="flex items-center gap-2 text-sm">
-            <span class="text-slate-400">Total uang di semua dompet</span>
-        </div>
-    </div>
-
-    <!-- Card 2: Modal Terkunci -->
-    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 relative overflow-hidden">
-        <div class="absolute top-0 right-0 w-16 h-16 bg-blue-50 rounded-bl-full -mr-2 -mt-2"></div>
-        <div class="flex justify-between items-start mb-4 relative z-10">
-            <div>
-                <p class="text-xs font-semibold text-blue-500 uppercase tracking-wider flex items-center gap-1">
-                    <i data-lucide="lock" class="w-3 h-3"></i> Modal Terkunci
-                </p>
-                <h3 class="text-2xl font-bold text-slate-800 mt-1">Rp <?= number_format($modal_terkunci, 0, ',', '.') ?></h3>
-            </div>
-            <div class="p-2 bg-blue-50 rounded-lg">
-                <i data-lucide="shield-check" class="w-5 h-5 text-blue-600"></i>
-            </div>
-        </div>
-        <p class="text-xs text-slate-500 relative z-10">Dana ini <b>DILARANG</b> dipakai pribadi.</p>
-        <div class="w-full bg-slate-100 rounded-full h-1.5 mt-4">
-            <div class="bg-blue-500 h-1.5 rounded-full" style="width: 100%"></div>
-        </div>
-    </div>
-
-    <!-- Card 3: Laba Bersih -->
-    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-        <div class="flex justify-between items-start mb-4">
-            <div>
-                <p class="text-xs font-semibold text-emerald-500 uppercase tracking-wider">Boleh Diambil (Prive)</p>
-                <h3 class="text-2xl font-bold text-slate-800 mt-1">Rp <?= number_format($laba_bersih, 0, ',', '.') ?></h3>
-            </div>
-            <div class="p-2 bg-emerald-50 rounded-lg">
-                <i data-lucide="coins" class="w-5 h-5 text-emerald-600"></i>
-            </div>
-        </div>
-        <?php if($laba_bersih < 0): ?>
-            <p class="text-xs text-red-500 font-bold mt-2">⚠️ MODAL TERGERUS!</p>
-        <?php else: ?>
-            <button class="text-xs bg-emerald-100 text-emerald-700 px-3 py-1.5 rounded-md font-medium hover:bg-emerald-200 transition w-full mt-2">
-                Ambil Gaji
-            </button>
-        <?php endif; ?>
-    </div>
-</div>
-
-<!-- MAIN CONTENT GRID -->
+<!-- Charts & Transactions Wrapper -->
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
     
-    <!-- LEFT: CHART SECTION -->
-    <div class="lg:col-span-2 bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-        <div class="flex justify-between items-center mb-6">
-            <h3 class="font-bold text-slate-800">Tren Arus Kas (Bulan Ini)</h3>
+    <!-- Chart Section -->
+    <div class="lg:col-span-2 bg-white rounded-xl shadow-sm p-5">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="font-bold text-slate-800">Arus Kas Bulan Ini</h3>
+            <span class="inline-flex items-center px-2 py-1 bg-green-50 text-green-600 text-xs font-medium rounded-full">
+                <span class="w-2 h-2 bg-green-500 rounded-full mr-1.5 animate-pulse"></span>
+                Realtime
+            </span>
         </div>
-        <div class="relative h-72 w-full">
-            <canvas id="cashflowChart"></canvas>
+        <div class="relative h-80 w-full">
+            <canvas id="myAreaChart"></canvas>
         </div>
     </div>
 
-    <!-- RIGHT: RECENT TRANSACTIONS -->
-    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-        <div class="flex justify-between items-center mb-6">
+    <!-- Recent Transactions List -->
+    <div class="bg-white rounded-xl shadow-sm p-0 overflow-hidden flex flex-col">
+        <div class="p-5 border-b border-slate-100 flex justify-between items-center">
             <h3 class="font-bold text-slate-800">Transaksi Terakhir</h3>
+            <!-- Tombol Trigger Modal Export -->
+            <button onclick="toggleModal('modalExport')" class="flex items-center text-xs font-medium text-slate-600 hover:text-primary bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-full transition-colors">
+                <i data-lucide="download" class="w-3 h-3 mr-1.5"></i> Export Laporan
+            </button>
         </div>
         
-        <div class="space-y-4">
+        <div class="flex-1 overflow-y-auto max-h-[400px]">
             <?php if(empty($recent_trx)): ?>
-                <p class="text-center text-slate-400 py-4">Belum ada transaksi.</p>
+                <div class="flex flex-col items-center justify-center h-48 text-slate-400">
+                    <i data-lucide="inbox" class="w-10 h-10 mb-2 opacity-50"></i>
+                    <p class="text-sm">Belum ada transaksi</p>
+                </div>
             <?php else: ?>
-                <?php foreach($recent_trx as $trx): ?>
-                    <div class="flex items-center justify-between border-b border-slate-50 pb-3 last:border-0">
-                        <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-full <?= $trx['type'] == 'income' ? 'bg-emerald-50 text-emerald-600' : 'bg-red-50 text-red-600' ?> flex items-center justify-center">
-                                <i data-lucide="<?= $trx['type'] == 'income' ? 'arrow-down-left' : 'shopping-cart' ?>" class="w-5 h-5"></i>
+                <ul class="divide-y divide-slate-50">
+                    <?php foreach($recent_trx as $t): ?>
+                        <?php 
+                            $catName = '-';
+                            foreach($categories as $c) {
+                                $c = (array) $c;
+                                if($c['id'] == $t['category_id']) { $catName = $c['name']; break; }
+                            }
+                            $isIncome = $t['type'] == 'income';
+                        ?>
+                        <li class="p-4 hover:bg-slate-50 transition-colors">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 rounded-full flex items-center justify-center <?= $isIncome ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600' ?>">
+                                        <i data-lucide="<?= $isIncome ? 'arrow-down' : 'arrow-up' ?>" class="w-5 h-5"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm font-semibold text-slate-800 line-clamp-1"><?= esc($t['description']) ?></p>
+                                        <div class="flex items-center gap-2 mt-0.5">
+                                            <span class="text-xs text-slate-500"><?= date('d M, H:i', strtotime($t['created_at'])) ?></span>
+                                            <span class="text-[10px] px-1.5 py-0.5 bg-slate-100 text-slate-500 rounded border border-slate-200"><?= $catName ?></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-sm font-bold <?= $isIncome ? 'text-green-600' : 'text-red-600' ?>">
+                                        <?= $isIncome ? '+' : '-' ?> <?= number_format($t['amount'], 0, ',', '.') ?>
+                                    </p>
+                                </div>
                             </div>
-                            <div>
-                                <p class="text-sm font-semibold text-slate-800"><?= esc($trx['description']) ?></p>
-                                <p class="text-xs text-slate-400">
-                                    <?= date('d M', strtotime($trx['transaction_date'])) ?> • <?= esc($trx['category_name']) ?>
-                                    <?php if(!empty($trx['attachment'])): ?>
-                                        <i data-lucide="paperclip" class="w-3 h-3 inline-block ml-1 text-slate-400"></i>
-                                    <?php endif; ?>
-                                </p>
-                            </div>
-                        </div>
-                        <span class="text-sm font-bold <?= $trx['type'] == 'income' ? 'text-emerald-600' : 'text-slate-800' ?>">
-                            <?= $trx['type'] == 'income' ? '+' : '-' ?>Rp <?= number_format($trx['amount'], 0, ',', '.') ?>
-                        </span>
-                    </div>
-                <?php endforeach; ?>
+                        </li>
+                    <?php endforeach; ?>
+                </ul>
             <?php endif; ?>
+        </div>
+        <div class="p-3 bg-slate-50 border-t border-slate-100 text-center">
+            <a href="<?= base_url('transactions') ?>" class="text-sm text-primary font-medium hover:underline">Lihat Semua</a>
         </div>
     </div>
 </div>
 
-<!-- MODAL ADD TRANSACTION (EXISTING) -->
-<div id="modalTransaction" class="fixed inset-0 z-[60] hidden overflow-y-auto">
+<!-- Modal Transaksi -->
+<div id="modalTransaction" class="hidden fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
     <div class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm transition-opacity" onclick="toggleModal('modalTransaction')"></div>
     <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
         <div class="relative transform overflow-hidden rounded-2xl bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
-            
-            <div class="bg-white px-4 pb-4 pt-5 sm:p-6 border-b border-slate-100 flex justify-between">
-                <h3 class="text-lg font-bold text-slate-900">Catat Transaksi Baru</h3>
-                <button onclick="toggleModal('modalTransaction')"><i data-lucide="x" class="text-slate-400"></i></button>
+            <div class="bg-primary px-4 py-3 sm:px-6 flex justify-between items-center">
+                <h3 class="text-base font-semibold leading-6 text-white">Catat Transaksi</h3>
+                <button onclick="toggleModal('modalTransaction')" class="text-white/70 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
             </div>
-
-            <form action="/dashboard/save_transaction" method="POST" enctype="multipart/form-data" class="p-4 sm:p-6 space-y-4">
-                <?= csrf_field() ?>
-                
-                <div class="grid grid-cols-2 gap-4">
-                    <!-- Type Selection -->
+            <form action="<?= base_url('dashboard/save_transaction') ?>" method="post" enctype="multipart/form-data">
+                <div class="px-4 py-5 sm:p-6 space-y-4">
                     <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-1">Jenis</label>
-                        <select name="type" class="block w-full py-2 px-3 border border-slate-300 rounded-lg bg-white">
-                            <option value="income">Pemasukan (+)</option>
-                            <option value="expense">Pengeluaran (-)</option>
-                        </select>
+                        <label class="block text-xs font-medium text-slate-500 mb-1 uppercase">Tipe Transaksi</label>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <input type="radio" name="type" id="type_expense" value="expense" class="peer hidden" checked>
+                                <label for="type_expense" class="flex items-center justify-center w-full px-4 py-2 border border-slate-200 rounded-lg cursor-pointer text-slate-600 hover:bg-slate-50 peer-checked:bg-red-50 peer-checked:text-red-600 peer-checked:border-red-500 transition-all">
+                                    <i data-lucide="arrow-up" class="w-4 h-4 mr-2"></i> Pengeluaran
+                                </label>
+                            </div>
+                            <div>
+                                <input type="radio" name="type" id="type_income" value="income" class="peer hidden">
+                                <label for="type_income" class="flex items-center justify-center w-full px-4 py-2 border border-slate-200 rounded-lg cursor-pointer text-slate-600 hover:bg-slate-50 peer-checked:bg-green-50 peer-checked:text-green-600 peer-checked:border-green-500 transition-all">
+                                    <i data-lucide="arrow-down" class="w-4 h-4 mr-2"></i> Pemasukan
+                                </label>
+                            </div>
+                        </div>
                     </div>
-                    <!-- Amount -->
                     <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-1">Nominal (Rp)</label>
-                        <input type="number" name="amount" required class="block w-full py-2 px-3 border border-slate-300 rounded-lg font-bold" placeholder="0">
+                        <label class="block text-xs font-medium text-slate-500 mb-1 uppercase">Nominal</label>
+                        <div class="relative rounded-md shadow-sm">
+                            <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                                <span class="text-slate-500 sm:text-sm">Rp</span>
+                            </div>
+                            <input type="number" name="amount" class="block w-full rounded-lg border-0 py-2.5 pl-10 text-slate-900 ring-1 ring-inset ring-slate-300 font-semibold bg-slate-50" placeholder="0" required>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-medium text-slate-500 mb-1 uppercase">Dompet</label>
+                            <select name="wallet_id" class="block w-full rounded-lg border-0 py-2.5 text-slate-900 ring-1 ring-inset ring-slate-300 bg-white" required>
+                                <?php foreach($wallets as $w): $w = (array)$w; ?>
+                                    <option value="<?= $w['id'] ?>"><?= $w['name'] ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-500 mb-1 uppercase">Kategori</label>
+                            <select name="category_id" class="block w-full rounded-lg border-0 py-2.5 text-slate-900 ring-1 ring-inset ring-slate-300 bg-white" required>
+                                <?php foreach($categories as $c): $c = (array)$c; ?>
+                                    <option value="<?= $c['id'] ?>"><?= $c['name'] ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-500 mb-1 uppercase">Keterangan</label>
+                        <textarea name="description" rows="2" class="block w-full rounded-lg border-0 py-2 text-slate-900 ring-1 ring-inset ring-slate-300 bg-white" placeholder="Cth: Makan siang..."></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-500 mb-1 uppercase">Struk (Opsional)</label>
+                        <input type="file" name="attachment" class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-white hover:file:bg-slate-700 transition-colors"/>
                     </div>
                 </div>
-
-                <!-- Wallet -->
-                <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">Dompet / Akun</label>
-                    <select name="wallet_id" class="block w-full py-2 px-3 border border-slate-300 rounded-lg bg-white">
-                        <?php foreach($wallets as $w): ?>
-                            <option value="<?= $w->id ?>"><?= esc($w->name) ?> (Sisa: Rp <?= number_format($w->balance,0,',','.') ?>)</option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
-
-                <!-- Category -->
-                <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">Kategori</label>
-                    <select name="category_id" class="block w-full py-2 px-3 border border-slate-300 rounded-lg bg-white">
-                        <?php foreach($categories as $c): ?>
-                            <option value="<?= $c->id ?>">
-                                <?= esc($c->name) ?> 
-                                <?= $c->is_prive ? '(PRIVE - Hati-hati)' : '' ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
-
-                <!-- Input File -->
-                <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">Bukti Struk/Nota (Foto)</label>
-                    <input type="file" name="attachment" accept="image/png, image/jpeg" class="block w-full text-sm text-slate-500
-                        file:mr-4 file:py-2 file:px-4
-                        file:rounded-full file:border-0
-                        file:text-sm file:font-semibold
-                        file:bg-slate-100 file:text-primary
-                        hover:file:bg-slate-200
-                    "/>
-                    <p class="text-xs text-slate-400 mt-1">Maksimal 2MB (JPG/PNG)</p>
-                </div>
-
-                <!-- Description -->
-                <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">Keterangan</label>
-                    <textarea name="description" rows="2" class="block w-full py-2 px-3 border border-slate-300 rounded-lg" placeholder="Contoh: Makan siang staff"></textarea>
-                </div>
-
-                <div class="mt-6 flex justify-end gap-3">
-                    <button type="button" onclick="toggleModal('modalTransaction')" class="px-4 py-2 text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50">Batal</button>
-                    <button type="submit" class="px-4 py-2 text-white bg-primary rounded-lg hover:bg-slate-800">Simpan</button>
+                <div class="bg-slate-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+                    <button type="submit" class="inline-flex w-full justify-center rounded-lg bg-primary px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-slate-700 sm:ml-3 sm:w-auto transition-colors">Simpan</button>
+                    <button type="button" onclick="toggleModal('modalTransaction')" class="mt-3 inline-flex w-full justify-center rounded-lg bg-white px-3 py-2 text-sm font-semibold text-slate-900 shadow-sm ring-1 ring-inset ring-slate-300 hover:bg-slate-50 sm:mt-0 sm:w-auto transition-colors">Batal</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
 
-<!-- MODAL FILTER EXPORT (BARU) -->
-<div id="modalExport" class="fixed inset-0 z-[70] hidden overflow-y-auto">
+<!-- Modal Export Laporan (BARU) -->
+<div id="modalExport" class="hidden fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
     <div class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm transition-opacity" onclick="toggleModal('modalExport')"></div>
-    <div class="flex min-h-full items-center justify-center p-4">
-        <div class="relative bg-white rounded-2xl shadow-xl w-full max-w-sm p-6">
-            <h3 class="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
-                <i data-lucide="file-text" class="w-5 h-5 text-red-600"></i> Export Laporan PDF
-            </h3>
-            
-            <form action="/dashboard/export_pdf" method="get" target="_blank">
-                <div class="space-y-4">
-                    <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-1">Dari Tanggal</label>
-                        <input type="date" name="start_date" required value="<?= date('Y-m-01') ?>" class="w-full border-slate-300 rounded-lg p-2 text-sm">
+    <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+        <div class="relative transform overflow-hidden rounded-2xl bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-sm">
+            <div class="bg-white px-4 py-5 sm:p-6">
+                <div class="text-center">
+                    <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 mb-4">
+                        <i data-lucide="download" class="h-6 w-6 text-blue-600"></i>
                     </div>
-                    <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-1">Sampai Tanggal</label>
-                        <input type="date" name="end_date" required value="<?= date('Y-m-d') ?>" class="w-full border-slate-300 rounded-lg p-2 text-sm">
-                    </div>
+                    <h3 class="text-base font-semibold leading-6 text-slate-900" id="modal-title">Export Laporan</h3>
+                    <p class="text-sm text-slate-500">Pilih periode laporan yang ingin diunduh.</p>
                 </div>
                 
-                <div class="mt-6 flex gap-3">
-                    <button type="button" onclick="toggleModal('modalExport')" class="flex-1 py-2 text-slate-500 bg-slate-100 rounded-lg hover:bg-slate-200">Batal</button>
-                    <button type="submit" class="flex-1 py-2 text-white bg-red-600 rounded-lg hover:bg-red-700 shadow-lg shadow-red-200" onclick="toggleModal('modalExport')">
-                        Download PDF
-                    </button>
+                <div class="mt-5 space-y-4">
+                    <div>
+                        <label class="block text-xs font-medium text-slate-500 mb-1 text-left">BULAN</label>
+                        <select id="exportMonth" class="block w-full rounded-lg border-0 py-2 text-slate-900 ring-1 ring-inset ring-slate-300 focus:ring-2 focus:ring-inset focus:ring-blue-500 sm:text-sm sm:leading-6">
+                            <?php 
+                            $months = [1=>'Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+                            foreach($months as $k => $v) {
+                                $selected = ($k == date('n')) ? 'selected' : '';
+                                echo "<option value='$k' $selected>$v</option>";
+                            }
+                            ?>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-500 mb-1 text-left">TAHUN</label>
+                        <select id="exportYear" class="block w-full rounded-lg border-0 py-2 text-slate-900 ring-1 ring-inset ring-slate-300 focus:ring-2 focus:ring-inset focus:ring-blue-500 sm:text-sm sm:leading-6">
+                            <?php 
+                            $currentYear = date('Y');
+                            for($i = $currentYear; $i >= $currentYear - 4; $i--) {
+                                echo "<option value='$i'>$i</option>";
+                            }
+                            ?>
+                        </select>
+                    </div>
                 </div>
-            </form>
+            </div>
+            <div class="bg-slate-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6 gap-2">
+                <button type="button" onclick="downloadReport('pdf')" class="inline-flex w-full justify-center rounded-lg bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 transition-colors">
+                    <i data-lucide="file-text" class="w-4 h-4 mr-2"></i> PDF
+                </button>
+                <button type="button" onclick="downloadReport('excel')" class="inline-flex w-full justify-center rounded-lg bg-emerald-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-emerald-500 transition-colors mt-2 sm:mt-0">
+                    <i data-lucide="file-spreadsheet" class="w-4 h-4 mr-2"></i> Excel
+                </button>
+                <button type="button" onclick="toggleModal('modalExport')" class="mt-2 sm:mt-0 inline-flex w-full justify-center rounded-lg bg-white px-3 py-2 text-sm font-semibold text-slate-900 shadow-sm ring-1 ring-inset ring-slate-300 hover:bg-slate-50">Batal</button>
+            </div>
         </div>
     </div>
 </div>
 
 <script>
+    // Inisialisasi Chart & Data Realtime
     document.addEventListener("DOMContentLoaded", function() {
-        const ctx = document.getElementById('cashflowChart').getContext('2d');
-        const gradient = ctx.createLinearGradient(0, 0, 0, 400);
-        gradient.addColorStop(0, 'rgba(16, 185, 129, 0.2)');
-        gradient.addColorStop(1, 'rgba(16, 185, 129, 0)');
+        const formatRupiah = (number) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(number);
 
-        const myChart = new Chart(ctx, {
+        var ctx = document.getElementById("myAreaChart").getContext('2d');
+        var myChart = new Chart(ctx, {
             type: 'line',
             data: {
-                labels: ['Minggu 1', 'Minggu 2', 'Minggu 3', 'Minggu 4'],
+                labels: [],
                 datasets: [{
-                    label: 'Arus Kas',
-                    data: [<?= $total_kas * 0.8 ?>, <?= $total_kas * 0.9 ?>, <?= $total_kas * 0.85 ?>, <?= $total_kas ?>],
+                    label: 'Pemasukan',
+                    data: [],
+                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
                     borderColor: '#10B981',
-                    backgroundColor: gradient,
                     borderWidth: 2,
-                    pointBackgroundColor: '#ffffff',
-                    pointBorderColor: '#10B981',
-                    pointRadius: 4,
+                    pointRadius: 0,
+                    pointHoverRadius: 4,
+                    fill: true,
+                    tension: 0.4
+                }, {
+                    label: 'Pengeluaran',
+                    data: [],
+                    backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                    borderColor: '#EF4444',
+                    borderWidth: 2,
+                    pointRadius: 0,
+                    pointHoverRadius: 4,
                     fill: true,
                     tension: 0.4
                 }]
             },
             options: {
-                responsive: true,
                 maintainAspectRatio: false,
-                plugins: { legend: { display: false } },
+                responsive: true,
+                interaction: { mode: 'index', intersect: false },
                 scales: {
-                    y: { beginAtZero: false, grid: { color: '#f1f5f9' } },
-                    x: { grid: { display: false } }
-                }
+                    x: { grid: { display: false }, ticks: { maxTicksLimit: 7 } },
+                    y: { border: { display: false }, grid: { color: '#f1f5f9' }, ticks: { callback: function(value) { return 'Rp ' + (value/1000).toLocaleString('id-ID') + 'k'; } } }
+                },
+                plugins: { legend: { display: false }, tooltip: { backgroundColor: '#1e293b', padding: 12, cornerRadius: 8, displayColors: false, callbacks: { label: function(context) { return context.dataset.label + ': ' + formatRupiah(context.parsed.y); } } } }
             }
         });
+
+        function updateChartData() {
+            fetch('<?= base_url('dashboard/chart-data') ?>')
+                .then(response => response.json())
+                .then(data => {
+                    myChart.data.labels = data.labels;
+                    myChart.data.datasets[0].data = data.income;
+                    myChart.data.datasets[1].data = data.expense;
+                    myChart.update('none');
+                    const elExpense = document.getElementById('val-expense');
+                    if(elExpense) elExpense.innerText = formatRupiah(data.summary.expense);
+                })
+                .catch(error => console.error('Error fetching data:', error));
+        }
+
+        updateChartData();
+        setInterval(updateChartData, 5000);
     });
+
+    // Fungsi Download Report
+    function downloadReport(type) {
+        const month = document.getElementById('exportMonth').value;
+        const year = document.getElementById('exportYear').value;
+        const baseUrl = '<?= base_url('dashboard') ?>';
+        
+        if (type === 'excel') {
+            window.location.href = `${baseUrl}/export_excel?month=${month}&year=${year}`;
+        } else {
+            window.location.href = `${baseUrl}/export_pdf?month=${month}&year=${year}`;
+        }
+    }
 </script>
 
 <?= $this->endSection() ?>
